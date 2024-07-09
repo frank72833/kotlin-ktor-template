@@ -60,3 +60,6 @@ src/main/webapp/studio/build
 # Docs
 .out/
 .jsdoc/
+
+# Compiled class
+build/
