@@ -63,3 +63,6 @@ src/main/webapp/studio/build
 
 # Compiled class
 build/
+
+# Gradle
+.gradle/
