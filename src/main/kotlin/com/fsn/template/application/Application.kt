@@ -3,8 +3,9 @@ package com.fsn.template.application
 import com.fsn.template.application.account.adapter.AccountAdapter
 import com.fsn.template.application.account.controller.configureAccountController
 import com.fsn.template.application.account.service.AccountService
-import com.fsn.template.application.configuration.configureRouting
+import com.fsn.template.application.configuration.configureErrorHandlers
 import com.fsn.template.application.configuration.configureSerialization
+import com.fsn.template.application.configuration.configureValidation
 import com.fsn.template.infrastructure.account.InMemAccountRepository
 import io.ktor.server.application.Application
 import io.ktor.server.engine.embeddedServer
@@ -16,8 +17,10 @@ fun main() {
 }
 
 fun Application.module() {
+    // API Configuration
     configureSerialization()
-    configureRouting()
+    configureErrorHandlers()
+    configureValidation()
 
     // Accounts
     val accountRepository = InMemAccountRepository()

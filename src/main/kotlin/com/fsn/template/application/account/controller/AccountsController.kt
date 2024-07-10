@@ -14,6 +14,7 @@ import io.ktor.server.routing.routing
 
 fun Application.configureAccountController(accountAdapter: AccountAdapter) {
     routing {
+
         route("/accounts") {
             get("/{id}") {
                 val id = call.parameters["id"]
