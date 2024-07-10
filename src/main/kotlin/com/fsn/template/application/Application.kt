@@ -3,24 +3,23 @@ package com.fsn.template.application
 import com.fsn.template.application.account.adapter.AccountAdapter
 import com.fsn.template.application.account.controller.configureAccountController
 import com.fsn.template.application.account.service.AccountService
+import com.fsn.template.application.configuration.configureDatabases
 import com.fsn.template.application.configuration.configureErrorHandlers
+import com.fsn.template.application.configuration.configureHealth
 import com.fsn.template.application.configuration.configureSerialization
 import com.fsn.template.application.configuration.configureValidation
 import com.fsn.template.infrastructure.account.InMemAccountRepository
 import io.ktor.server.application.Application
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
 
-fun main() {
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
-        .start(wait = true)
-}
+fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module() {
     // API Configuration
+    configureHealth()
     configureSerialization()
     configureErrorHandlers()
     configureValidation()
+    configureDatabases()
 
     // Accounts
     val accountRepository = InMemAccountRepository()
@@ -29,4 +28,8 @@ fun Application.module() {
     configureAccountController(accountAdapter)
 
     // Transactions
+}
+
+fun Application.testModule() {
+    // Testing module
 }

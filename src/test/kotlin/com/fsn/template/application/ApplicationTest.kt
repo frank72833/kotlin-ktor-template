@@ -1,6 +1,6 @@
 package com.fsn.template.application
 
-import com.fsn.template.application.configuration.configureRouting
+import com.fsn.template.application.configuration.configureHealth
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
@@ -12,7 +12,7 @@ class ApplicationTest {
     @Test
     fun testRoot() = testApplication {
         application {
-            configureRouting()
+            configureHealth()
         }
         client.get("/health").apply {
             assertEquals(HttpStatusCode.OK, status)

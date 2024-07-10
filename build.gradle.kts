@@ -1,8 +1,9 @@
 val kotlin_version: String by project
 val logback_version: String by project
-val postgres_version: String by project
-val h2_version: String by project
 val exposed_version: String by project
+val flyway_version: String by project
+val hikari_version: String by project
+val mysql_version: String by project
 
 plugins {
     kotlin("jvm") version "2.0.0"
@@ -14,10 +15,7 @@ group = "com.fsn.template"
 version = "0.0.1"
 
 application {
-    mainClass.set("com.fsn.template.application.ApplicationKt")
-
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+    mainClass.set("io.ktor.server.netty.EngineMain")
 }
 
 repositories {
@@ -25,16 +23,23 @@ repositories {
 }
 
 dependencies {
+    // API
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
     implementation("io.ktor:ktor-server-request-validation")
-    implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
-    implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
     implementation("io.ktor:ktor-server-host-common-jvm")
     implementation("io.ktor:ktor-server-status-pages-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
+    // DB
+    implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
+    implementation("org.flywaydb:flyway-core:$flyway_version")
+    implementation("com.zaxxer:HikariCP:$hikari_version")
+    implementation("mysql:mysql-connector-java:$mysql_version")
+    // Logging
     implementation("ch.qos.logback:logback-classic:$logback_version")
+    // Testing
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }

@@ -49,10 +49,4 @@ fun Application.configureErrorHandlers() {
             )
         }
     }
-
-    routing {
-        get("/health") {
-            call.respondText("ok")
-        }
-    }
 }
