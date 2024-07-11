@@ -5,11 +5,13 @@ import com.fsn.template.application.account.controller.configureAccountControlle
 import com.fsn.template.application.account.service.AccountService
 import com.fsn.template.application.configuration.configureDatabases
 import com.fsn.template.application.configuration.configureErrorHandlers
+import com.fsn.template.application.configuration.configureFlyway
 import com.fsn.template.application.configuration.configureHealth
 import com.fsn.template.application.configuration.configureSerialization
 import com.fsn.template.application.configuration.configureValidation
-import com.fsn.template.infrastructure.account.InMemAccountRepository
+import com.fsn.template.infrastructure.account.ExposedAccountRepository
 import io.ktor.server.application.Application
+import java.time.Clock
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -20,9 +22,10 @@ fun Application.module() {
     configureErrorHandlers()
     configureValidation()
     configureDatabases()
+    configureFlyway()
 
     // Accounts
-    val accountRepository = InMemAccountRepository()
+    val accountRepository = ExposedAccountRepository()
     val accountService = AccountService(accountRepository)
     val accountAdapter = AccountAdapter(accountService)
     configureAccountController(accountAdapter)

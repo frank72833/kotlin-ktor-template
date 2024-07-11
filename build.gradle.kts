@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 val kotlin_version: String by project
 val logback_version: String by project
 val exposed_version: String by project
@@ -18,12 +20,19 @@ application {
     mainClass.set("io.ktor.server.netty.EngineMain")
 }
 
+// Marge flyway services due to clashing in fatJar
+tasks.withType<ShadowJar> {
+    mergeServiceFiles {
+        setPath("META-INF/services/org.flywaydb.core.extensibility.Plugin")
+    }
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    // API
+    // ## API ##
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
@@ -31,15 +40,20 @@ dependencies {
     implementation("io.ktor:ktor-server-host-common-jvm")
     implementation("io.ktor:ktor-server-status-pages-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
-    // DB
+    // ## DB ##
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
-    implementation("org.flywaydb:flyway-core:$flyway_version")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
+    // Required to work with datetime in DB
+    implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
     implementation("com.zaxxer:HikariCP:$hikari_version")
     implementation("mysql:mysql-connector-java:$mysql_version")
-    // Logging
+    // Flyway
+    implementation("org.flywaydb:flyway-core:$flyway_version")
+    implementation("org.flywaydb:flyway-mysql:$flyway_version")
+    // ## Logging ##
     implementation("ch.qos.logback:logback-classic:$logback_version")
-    // Testing
+    // ## Testing ##
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
