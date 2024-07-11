@@ -8,5 +8,4 @@ import kotlinx.datetime.toLocalDateTime
 
 fun now(): Instant = Clock.System.now()
 
-fun localDateTimeUtcNow(): LocalDateTime =
-    now().toLocalDateTime(TimeZone.UTC)
+fun localDateTimeUtcNow(): LocalDateTime = now().toLocalDateTime(TimeZone.UTC)

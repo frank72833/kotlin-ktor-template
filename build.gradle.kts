@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.builtins.StandardNames.FqNames.target
 
 val kotlin_version: String by project
 val logback_version: String by project
@@ -11,6 +12,7 @@ plugins {
     kotlin("jvm") version "2.0.0"
     id("io.ktor.plugin") version "2.3.12"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
+    id("com.diffplug.spotless") version "7.0.0.BETA1"
 }
 
 group = "com.fsn.template"
@@ -18,6 +20,12 @@ version = "0.0.1"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
+}
+
+spotless {
+    kotlin {
+        ktfmt("0.51").googleStyle()
+    }
 }
 
 // Marge flyway services due to clashing in fatJar
