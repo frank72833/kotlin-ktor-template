@@ -45,7 +45,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
     // Required to work with datetime in DB
-    implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposed_version")
     implementation("com.zaxxer:HikariCP:$hikari_version")
     implementation("mysql:mysql-connector-java:$mysql_version")
     // Flyway

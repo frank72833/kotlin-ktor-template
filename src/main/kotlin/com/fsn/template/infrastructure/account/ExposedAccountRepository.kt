@@ -1,5 +1,6 @@
 package com.fsn.template.infrastructure.account
 
+import com.fsn.template.core.localDateTimeUtcNow
 import com.fsn.template.domain.account.Account
 import com.fsn.template.domain.account.AccountRepository
 import com.fsn.template.infrastructure.utils.suspendTransaction
@@ -7,9 +8,8 @@ import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
-import org.jetbrains.exposed.sql.javatime.CurrentDateTime
-import org.jetbrains.exposed.sql.javatime.datetime
-import java.time.LocalDateTime
+import org.jetbrains.exposed.sql.kotlin.datetime.CurrentDateTime
+import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import java.util.Currency
 import java.util.UUID
 
@@ -51,7 +51,7 @@ class ExposedAccountRepository: AccountRepository {
             ownerName = account.ownerName
             balance = account.balance
             currencyCode = account.currency.currencyCode
-            updatedDateTime = LocalDateTime.now()
+            updatedDateTime = localDateTimeUtcNow()
         }.toDomain()
     }
 }
