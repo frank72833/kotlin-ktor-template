@@ -2,6 +2,7 @@ package com.fsn.template.application.account.controller
 
 import com.fsn.template.application.account.adapter.AccountAdapter
 import com.fsn.template.application.account.adapter.request.CreateAccountApiRequest
+import com.fsn.template.application.account.adapter.request.RequestAccountId
 import com.fsn.template.application.account.adapter.request.UpdateAccountApiRequest
 import com.fsn.template.application.getPathParam
 import io.ktor.http.HttpStatusCode
@@ -19,9 +20,9 @@ fun Application.configureAccountController(accountAdapter: AccountAdapter) {
   routing {
     route("/accounts") {
       get("/{id}") {
-        val id = call.getPathParam("id")
+        val accountId = RequestAccountId.fromString(call.getPathParam("id"))
 
-        val response = accountAdapter.getAccount(id)
+        val response = accountAdapter.getAccount(accountId)
         if (response == null) {
           call.respond(HttpStatusCode.NotFound)
           return@get
@@ -37,9 +38,9 @@ fun Application.configureAccountController(accountAdapter: AccountAdapter) {
       }
 
       put("/{id}") {
-        val id = call.getPathParam("id")
+        val accountId = RequestAccountId.fromString(call.getPathParam("id"))
         val request = call.receive<UpdateAccountApiRequest>()
-        val response = accountAdapter.updateAccount(id, request)
+        val response = accountAdapter.updateAccount(accountId, request)
         call.respond(response)
       }
     }

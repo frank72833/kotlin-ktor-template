@@ -2,9 +2,9 @@ package com.fsn.template.infrastructure.account
 
 import com.fsn.template.core.localDateTimeUtcNow
 import com.fsn.template.domain.account.Account
+import com.fsn.template.domain.account.AccountId
 import com.fsn.template.domain.account.AccountRepository
 import java.util.Currency
-import java.util.UUID
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.jooq.DSLContext
 import org.jooq.generated.tables.records.AccountsRecord
@@ -12,10 +12,10 @@ import org.jooq.generated.tables.references.ACCOUNTS
 import org.jooq.kotlin.coroutines.transactionCoroutine
 
 class SqlAccountRepository(private val dslContext: DSLContext) : AccountRepository {
-  override suspend fun getAccount(id: UUID): Account? =
+  override suspend fun getAccount(id: AccountId): Account? =
     dslContext
       .selectFrom(ACCOUNTS)
-      .where(ACCOUNTS.ID.eq(id.toString()))
+      .where(ACCOUNTS.ID.eq(id.value.toString()))
       .awaitFirstOrNull()
       ?.toDomain()
 
@@ -34,17 +34,17 @@ class SqlAccountRepository(private val dslContext: DSLContext) : AccountReposito
 
 fun Account.toEntity() =
   AccountsRecord(
-    id = this.id.toString(),
-    ownername = this.ownerName,
-    balance = this.balance,
-    currencyCode = this.currency.currencyCode,
+    id = id.value.toString(),
+    ownername = ownerName,
+    balance = balance,
+    currencyCode = currency.currencyCode,
     createdDateTime = createdDateTime ?: localDateTimeUtcNow(),
     updatedDateTime = localDateTimeUtcNow(),
   )
 
 fun AccountsRecord.toDomain() =
   Account(
-    id = UUID.fromString(id),
+    id = AccountId.fromString(id),
     ownerName = ownername,
     balance = balance,
     currency = Currency.getInstance(currencyCode),

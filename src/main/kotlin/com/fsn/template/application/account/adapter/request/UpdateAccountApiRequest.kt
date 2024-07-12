@@ -1,5 +1,6 @@
 package com.fsn.template.application.account.adapter.request
 
+import com.fsn.template.domain.account.AccountId
 import com.fsn.template.domain.account.command.UpdateAccountCommand
 import io.ktor.server.plugins.requestvalidation.ValidationResult
 import java.util.UUID
@@ -8,9 +9,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UpdateAccountApiRequest(val ownerName: String, val balance: String) {
 
-  fun toDomainCommand(id: String): UpdateAccountCommand =
+  fun toDomainCommand(id: UUID): UpdateAccountCommand =
     UpdateAccountCommand(
-      id = UUID.fromString(id),
+      accountId = AccountId(id),
       ownerName = ownerName,
       balance = balance.toBigDecimal(),
     )

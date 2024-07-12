@@ -18,4 +18,9 @@ data class CreateAccountResponse(
 )
 
 fun Account.toCreateAccountResponse() =
-  CreateAccountResponse(id = id, ownerName = ownerName, balance = balance, currency = currency)
+  CreateAccountResponse(
+    id = id.value,
+    ownerName = ownerName,
+    balance = balance,
+    currency = currency,
+  )

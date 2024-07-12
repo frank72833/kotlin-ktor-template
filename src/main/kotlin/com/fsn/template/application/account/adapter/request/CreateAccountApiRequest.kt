@@ -1,6 +1,7 @@
 package com.fsn.template.application.account.adapter.request
 
 import com.fsn.template.core.currencyExists
+import com.fsn.template.domain.account.AccountId
 import com.fsn.template.domain.account.command.CreateAccountCommand
 import io.ktor.server.plugins.requestvalidation.ValidationResult
 import java.math.BigDecimal
@@ -16,7 +17,7 @@ data class CreateAccountApiRequest(
 ) {
   fun toDomainCommand(): CreateAccountCommand =
     CreateAccountCommand(
-      id = UUID.randomUUID(),
+      accountId = AccountId(UUID.randomUUID()),
       ownerName = ownerName,
       balance = BigDecimal("12"),
       currency = Currency.getInstance("EUR"),
