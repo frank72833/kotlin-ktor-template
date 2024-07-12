@@ -11,6 +11,8 @@ import com.fsn.template.application.configuration.configureSerialization
 import com.fsn.template.application.configuration.configureValidation
 import com.fsn.template.infrastructure.account.SqlAccountRepository
 import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.plugins.requestvalidation.RequestValidationException
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -31,6 +33,10 @@ fun Application.module() {
 
   // Transactions
 }
+
+fun ApplicationCall.getPathParam(param: String): String =
+  this.parameters[param]
+    ?: throw RequestValidationException(param, listOf("Path param $param not found"))
 
 fun Application.testModule() {
   // Testing module

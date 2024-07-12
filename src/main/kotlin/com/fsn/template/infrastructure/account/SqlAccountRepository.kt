@@ -19,9 +19,15 @@ class SqlAccountRepository(private val dslContext: DSLContext) : AccountReposito
       .awaitFirstOrNull()
       ?.toDomain()
 
-  override suspend fun createAccount(account: Account): Account =
+  override suspend fun upsertAccount(account: Account): Account =
     dslContext.transactionCoroutine { config ->
-      config.dsl().newRecord(ACCOUNTS, account.toEntity()).store()
+      config
+        .dsl()
+        .insertInto(ACCOUNTS)
+        .set(account.toEntity())
+        .onDuplicateKeyUpdate()
+        .set(account.toEntity())
+        .execute()
       account
     }
 }
