@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val kotlin_version: String by project
 val logback_version: String by project
@@ -7,6 +8,7 @@ val flyway_version: String by project
 val hikari_version: String by project
 val mysql_version: String by project
 val jooq_kotlin_version: String by project
+val arrow_version: String by project
 
 plugins {
     kotlin("jvm") version "2.0.0"
@@ -27,6 +29,12 @@ application {
 tasks.withType<ShadowJar> {
     mergeServiceFiles {
         setPath("META-INF/services/org.flywaydb.core.extensibility.Plugin")
+    }
+}
+
+tasks.withType<KotlinCompile> {
+    compilerOptions {
+        freeCompilerArgs.add("-Xcontext-receivers")
     }
 }
 
@@ -117,6 +125,8 @@ dependencies {
     implementation("io.ktor:ktor-server-host-common-jvm")
     implementation("io.ktor:ktor-server-status-pages-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
+    // ## Functional Programming ##
+    implementation("io.arrow-kt:arrow-core:$arrow_version")
     // ## DB ##
     implementation("org.jooq:jooq-kotlin:$jooq_kotlin_version")
     implementation("org.jooq:jooq-kotlin-coroutines:$jooq_kotlin_version")

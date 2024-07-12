@@ -6,7 +6,7 @@ import java.math.BigDecimal
 import java.util.Currency
 import java.util.UUID
 
-class CreateAccountCommand(
+data class CreateAccountCommand(
   val accountId: AccountId = AccountId(UUID.randomUUID()),
   val ownerName: String,
   val balance: BigDecimal,

@@ -4,7 +4,7 @@ import com.fsn.template.domain.account.Account
 import com.fsn.template.domain.account.AccountId
 import java.math.BigDecimal
 
-class UpdateAccountCommand(
+data class UpdateAccountCommand(
   val accountId: AccountId,
   val ownerName: String,
   val balance: BigDecimal,
