@@ -9,5 +9,6 @@ data class Account(
   val id: UUID,
   val ownerName: String,
   val balance: BigDecimal,
-  val currency: Currency
+  val currency: Currency,
+  val createdDateTime: LocalDateTime? = null,
 )

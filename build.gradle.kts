@@ -23,7 +23,7 @@ application {
     mainClass.set("io.ktor.server.netty.EngineMain")
 }
 
-// Marge flyway services due to clashing in fatJar
+// Merge flyway services due to clashing in fatJar
 tasks.withType<ShadowJar> {
     mergeServiceFiles {
         setPath("META-INF/services/org.flywaydb.core.extensibility.Plugin")
@@ -45,6 +45,7 @@ jooq {
             }
             database {
                 name = "org.jooq.meta.extensions.ddl.DDLDatabase"
+
                 properties {
 
                     // Specify the location of your SQL script.
@@ -118,6 +119,8 @@ dependencies {
     implementation("io.ktor:ktor-server-netty-jvm")
     // ## DB ##
     implementation("org.jooq:jooq-kotlin:$jooq_kotlin_version")
+    implementation("org.jooq:jooq-kotlin-coroutines:$jooq_kotlin_version")
+    // JOOQ code generator
     jooqCodegen("org.jooq:jooq-meta-extensions:$jooq_kotlin_version")
     // Required to work with datetime in DB
     implementation("com.zaxxer:HikariCP:$hikari_version")
