@@ -5,8 +5,8 @@ import com.fsn.template.application.account.adapter.AccountAdapter
 import com.fsn.template.application.account.adapter.request.CreateAccountApiRequest
 import com.fsn.template.application.account.adapter.request.RequestAccountId
 import com.fsn.template.application.account.adapter.request.UpdateAccountApiRequest
+import com.fsn.template.application.configuration.ErrorHttpResponse
 import com.fsn.template.application.configuration.ErrorResponse
-import com.fsn.template.application.configuration.HttpResponse
 import com.fsn.template.application.getPathParam
 import com.fsn.template.core.errors.ApplicationError
 import io.ktor.http.HttpStatusCode
@@ -65,17 +65,17 @@ fun Application.configureAccountController(accountAdapter: AccountAdapter) {
   }
 }
 
-private fun handleFailure(error: ApplicationError, call: ApplicationCall): HttpResponse =
+private fun handleFailure(error: ApplicationError, call: ApplicationCall): ErrorHttpResponse =
   when (error) {
     is ApplicationError.NotFoundError -> {
-      HttpResponse.ErrorHttpResponse(
+      ErrorHttpResponse(
         statusCode = HttpStatusCode.NotFound,
         errors = listOf(ErrorResponse(message = error.message, path = call.request.path())),
       )
     }
 
     else -> {
-      HttpResponse.ErrorHttpResponse(
+      ErrorHttpResponse(
         statusCode = HttpStatusCode.InternalServerError,
         errors = listOf(ErrorResponse(message = error.message, path = call.request.path())),
       )

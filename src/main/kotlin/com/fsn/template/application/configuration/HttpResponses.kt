@@ -5,17 +5,11 @@ import java.time.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed interface HttpResponse {
-  val status: String
-  val statusCode: HttpStatusCode
-
-  @Serializable
-  data class ErrorHttpResponse(
-    override val status: String = "error",
-    @Serializable(with = HttpStatusCodeSerializer::class) override val statusCode: HttpStatusCode,
-    val errors: List<ErrorResponse>,
-  ) : HttpResponse
-}
+data class ErrorHttpResponse(
+  val status: String = "error",
+  @Serializable(with = HttpStatusCodeSerializer::class) val statusCode: HttpStatusCode,
+  val errors: List<ErrorResponse>,
+)
 
 @Serializable
 data class ErrorResponse(

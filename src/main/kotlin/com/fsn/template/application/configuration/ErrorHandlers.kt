@@ -14,7 +14,7 @@ fun Application.configureErrorHandlers() {
       call.respond(
         status = HttpStatusCode.InternalServerError,
         message =
-          HttpResponse.ErrorHttpResponse(
+          ErrorHttpResponse(
             statusCode = HttpStatusCode.InternalServerError,
             errors =
               listOf(ErrorResponse(message = cause.localizedMessage, path = call.request.path())),
@@ -26,7 +26,7 @@ fun Application.configureErrorHandlers() {
       call.respond(
         status = HttpStatusCode.BadRequest,
         message =
-          HttpResponse.ErrorHttpResponse(
+          ErrorHttpResponse(
             statusCode = HttpStatusCode.InternalServerError,
             errors =
               cause.reasons.map {
