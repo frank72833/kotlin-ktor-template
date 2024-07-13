@@ -1,5 +1,6 @@
 package com.fsn.template.application.configuration
 
+import io.ktor.http.HttpStatusCode
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.Currency
@@ -48,4 +49,14 @@ object InstantSerializer : KSerializer<Instant> {
   override fun deserialize(decoder: Decoder): Instant = Instant.parse(decoder.decodeString())
 
   override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeString(value.toString())
+}
+
+object HttpStatusCodeSerializer : KSerializer<HttpStatusCode> {
+  override val descriptor: SerialDescriptor =
+    PrimitiveSerialDescriptor("HttpStatusCode", PrimitiveKind.STRING)
+
+  override fun deserialize(decoder: Decoder): HttpStatusCode =
+    HttpStatusCode.fromValue(decoder.decodeInt())
+
+  override fun serialize(encoder: Encoder, value: HttpStatusCode) = encoder.encodeInt(value.value)
 }
