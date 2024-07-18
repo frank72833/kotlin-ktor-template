@@ -3,21 +3,24 @@ package com.fsn.template.application.configuration
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.Application
-import org.jetbrains.exposed.sql.Database
+import org.jooq.DSLContext
+import org.jooq.SQLDialect
+import org.jooq.impl.DSL
 
-fun Application.configureDatabases() {
+fun Application.configureDatabases(): DSLContext {
   val driverClass = environment.config.property("storage.driverClassName").getString()
   val jdbcUrl = environment.config.property("storage.jdbcUrl").getString()
   val username = environment.config.property("storage.username").getString()
   val password = environment.config.property("storage.password").getString()
 
-  Database.connect(
+  return DSL.using(
     provideDataSource(
       url = jdbcUrl,
       username = username,
       password = password,
       driverClass = driverClass,
-    )
+    ),
+    SQLDialect.MYSQL,
   )
 }
 

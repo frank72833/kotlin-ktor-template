@@ -9,8 +9,10 @@ import com.fsn.template.application.configuration.configureFlyway
 import com.fsn.template.application.configuration.configureHealth
 import com.fsn.template.application.configuration.configureSerialization
 import com.fsn.template.application.configuration.configureValidation
-import com.fsn.template.infrastructure.account.ExposedAccountRepository
+import com.fsn.template.infrastructure.account.SqlAccountRepository
 import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.plugins.requestvalidation.RequestValidationException
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -20,17 +22,21 @@ fun Application.module() {
   configureSerialization()
   configureErrorHandlers()
   configureValidation()
-  configureDatabases()
+  val dslContext = configureDatabases()
   configureFlyway()
 
   // Accounts
-  val accountRepository = ExposedAccountRepository()
+  val accountRepository = SqlAccountRepository(dslContext)
   val accountService = AccountService(accountRepository)
   val accountAdapter = AccountAdapter(accountService)
   configureAccountController(accountAdapter)
 
   // Transactions
 }
+
+fun ApplicationCall.getPathParam(param: String): String =
+  this.parameters[param]
+    ?: throw RequestValidationException(param, listOf("Path param $param not found"))
 
 fun Application.testModule() {
   // Testing module
