@@ -18,4 +18,5 @@ data class Account(
   val balance: BigDecimal,
   val currency: Currency,
   val createdDateTime: LocalDateTime? = null,
+  val version: Long? = null
 )

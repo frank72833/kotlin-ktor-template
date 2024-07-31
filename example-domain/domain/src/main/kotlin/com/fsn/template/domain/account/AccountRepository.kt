@@ -8,7 +8,10 @@ interface AccountRepository {
   suspend fun getAccount(id: AccountId): Account
 
   context(Raise<ApplicationError>)
-  suspend fun upsertAccount(account: Account): Account
+  suspend fun createAccount(account: Account): Account
+
+  context(Raise<ApplicationError>)
+  suspend fun updateAccount(account: Account): Account
 }
 
 data class AccountNotFoundError(

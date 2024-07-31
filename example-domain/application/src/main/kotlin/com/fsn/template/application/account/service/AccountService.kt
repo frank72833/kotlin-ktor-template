@@ -15,14 +15,14 @@ class AccountService(private val accountRepository: AccountRepository) {
   context(Raise<ApplicationError>)
   suspend fun createAccount(request: CreateAccountCommand): Account {
     LOG.info("Creating account: $request")
-    return accountRepository.upsertAccount(request.toDomain())
+    return accountRepository.createAccount(request.toDomain())
   }
 
   context(Raise<ApplicationError>)
   suspend fun updateAccount(request: UpdateAccountCommand): Account {
     LOG.info("Updating account: $request")
     val account = getAccount(request.accountId)
-    return accountRepository.upsertAccount(request.updateDomain(account))
+    return accountRepository.updateAccount(request.updateDomain(account))
   }
 
   context(Raise<ApplicationError>)

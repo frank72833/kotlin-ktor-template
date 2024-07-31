@@ -24,6 +24,7 @@ jooq {
             }
             database {
                 name = "org.jooq.meta.extensions.ddl.DDLDatabase"
+                recordVersionFields = "VERSION"
 
                 properties {
 
