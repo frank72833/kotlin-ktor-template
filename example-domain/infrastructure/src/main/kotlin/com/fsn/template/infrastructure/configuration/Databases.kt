@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.Application
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
+import org.jooq.conf.Settings
 import org.jooq.impl.DSL
 
 fun Application.configureDatabases(): DSLContext {
@@ -21,6 +22,9 @@ fun Application.configureDatabases(): DSLContext {
       driverClass = driverClass,
     ),
     SQLDialect.MYSQL,
+    Settings()
+      .withExecuteWithOptimisticLocking(true)
+      .withExecuteWithOptimisticLockingExcludeUnversioned(true)
   )
 }
 

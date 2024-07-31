@@ -15,54 +15,72 @@ import org.jooq.DSLContext
 import org.jooq.generated.tables.records.AccountsRecord
 import org.jooq.generated.tables.references.ACCOUNTS
 import org.jooq.kotlin.coroutines.transactionCoroutine
+import org.slf4j.LoggerFactory
+
+private var LOG = LoggerFactory.getLogger(SqlAccountRepository::class.java)
 
 class SqlAccountRepository(private val dslContext: DSLContext) : AccountRepository {
 
   context(Raise<ApplicationError>)
   override suspend fun getAccount(id: AccountId): Account =
     catch({
-      dslContext
-        .selectFrom(ACCOUNTS)
-        .where(ACCOUNTS.ID.eq(id.value.toString()))
-        .awaitFirstOrNull()
-        ?.toDomain() ?: raise(AccountNotFoundError(id))
+      dslContext.transactionCoroutine { config ->
+        config.dsl()
+          .selectFrom(ACCOUNTS)
+          .where(ACCOUNTS.ID.eq(id.value.toString()))
+          .awaitFirstOrNull()
+          ?.toDomain() ?: raise(AccountNotFoundError(id))
+      }
     }) { exception ->
       raise(GenericAccountRepositoryError(exception))
     }
 
   context(Raise<ApplicationError>)
-  override suspend fun upsertAccount(account: Account): Account =
+  override suspend fun createAccount(account: Account): Account =
     catch({
       dslContext.transactionCoroutine { config ->
-        config
-          .dsl()
-          .insertInto(ACCOUNTS)
-          .set(account.toEntity())
-          .onDuplicateKeyUpdate()
-          .set(account.toEntity())
-          .execute()
-        account
+        val accountEntity = account.toEntity()
+        accountEntity.attach(config)
+        accountEntity.store()
+        accountEntity.toDomain()
       }
     }) { exception ->
+        LOG.error("SQL Account repository error", exception)
+        raise(GenericAccountRepositoryError(exception))
+    }
+
+  context(Raise<ApplicationError>)
+  override suspend fun updateAccount(account: Account): Account =
+    catch({
+      dslContext.transactionCoroutine { config ->
+        val accountEntity = account.toEntity()
+        accountEntity.attach(config)
+        accountEntity.update()
+        accountEntity.toDomain()
+      }
+    }) { exception ->
+      LOG.error("SQL Account repository error", exception)
       raise(GenericAccountRepositoryError(exception))
     }
 }
 
-fun Account.toEntity() =
+fun Account.toEntity(): AccountsRecord =
   AccountsRecord(
     id = id.value.toString(),
-    ownername = ownerName,
+    ownerName = ownerName,
     balance = balance,
     currencyCode = currency.currencyCode,
     createdDateTime = createdDateTime ?: localDateTimeUtcNow(),
     updatedDateTime = localDateTimeUtcNow(),
+    version = version ?: 1L
   )
 
 fun AccountsRecord.toDomain() =
   Account(
     id = AccountId.fromString(id),
-    ownerName = ownername,
+    ownerName = ownerName,
     balance = balance,
     currency = Currency.getInstance(currencyCode),
     createdDateTime = createdDateTime,
+    version = version
   )
