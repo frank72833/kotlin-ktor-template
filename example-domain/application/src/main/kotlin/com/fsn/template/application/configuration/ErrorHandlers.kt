@@ -15,58 +15,55 @@ import io.ktor.server.response.respond
 private var LOG = getLogger<SqlAccountRepository>()
 
 fun Application.configureErrorHandlers() {
-  install(StatusPages) {
-    exception<Throwable> { call, cause ->
-      LOG.error("An error has occurred", cause)
+    install(StatusPages) {
+        exception<Throwable> { call, cause ->
+            LOG.error("An error has occurred", cause)
 
-      call.respond(
-        status = HttpStatusCode.InternalServerError,
-        message =
-          ErrorHttpResponse(
-            statusCode = HttpStatusCode.InternalServerError,
-            errors =
-              listOf(ErrorResponse(message = cause.localizedMessage, path = call.request.path())),
-          ),
-      )
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                message =
+                ErrorHttpResponse(
+                    statusCode = HttpStatusCode.InternalServerError,
+                    errors =
+                    listOf(ErrorResponse(message = cause.localizedMessage, path = call.request.path())),
+                ),
+            )
+        }
+
+        exception<RequestValidationException> { call, cause ->
+            LOG.error("An error has occurred", cause)
+
+            call.respond(
+                status = HttpStatusCode.BadRequest,
+                message =
+                ErrorHttpResponse(
+                    statusCode = HttpStatusCode.BadRequest,
+                    errors =
+                    cause.reasons.map { reason ->
+                        ErrorResponse(message = reason, path = call.request.path())
+                    }
+                )
+            )
+        }
     }
-
-    exception<RequestValidationException> { call, cause ->
-      LOG.error("An error has occurred", cause)
-
-      call.respond(
-        status = HttpStatusCode.BadRequest,
-        message =
-          ErrorHttpResponse(
-            statusCode = HttpStatusCode.BadRequest,
-            errors =
-              cause.reasons.map { reason ->
-                ErrorResponse(message = reason, path = call.request.path())
-              }
-          )
-      )
-    }
-  }
 }
 
-
-typealias CustomHandleFailure = (ApplicationError, ApplicationCall) -> ErrorHttpResponse
-
-val defaultCustomHandleFailure = { error: ApplicationError, call: ApplicationCall -> ErrorHttpResponse(statusCode = HttpStatusCode.InternalServerError, errors = listOf(
-  ErrorResponse(message = error.message, path = call.request.path())
-)) }
-
 fun handleFailure(
-  error: ApplicationError,
-  call: ApplicationCall,
-  customHandleFailure: CustomHandleFailure = defaultCustomHandleFailure
+    error: ApplicationError,
+    call: ApplicationCall,
 ): ErrorHttpResponse =
-  when (error) {
-    is ApplicationError.NotFoundError -> {
-      ErrorHttpResponse(
-        statusCode = HttpStatusCode.NotFound,
-        errors = listOf(ErrorResponse(message = error.message, path = call.request.path())),
-      )
-    }
+    when (error) {
+        is ApplicationError.NotFoundError ->
+            ErrorHttpResponse(
+                statusCode = HttpStatusCode.NotFound,
+                errors = listOf(ErrorResponse(message = error.message, path = call.request.path())),
+            )
 
-    else -> customHandleFailure(error, call)
-  }
+        else -> {
+            LOG.error("An error has occurred: ${error.message}")
+            ErrorHttpResponse(
+                statusCode = HttpStatusCode.InternalServerError,
+                errors = listOf(ErrorResponse(message = error.message, path = call.request.path()))
+            )
+        }
+    }

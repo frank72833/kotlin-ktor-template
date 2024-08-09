@@ -4,6 +4,7 @@ import arrow.core.raise.Raise
 import arrow.core.raise.catch
 import com.fsn.template.core.errors.ApplicationError
 import com.fsn.template.core.localDateTimeUtcNow
+import com.fsn.template.core.toLocalDateTimeUtc
 import com.fsn.template.domain.account.Account
 import com.fsn.template.domain.account.AccountId
 import com.fsn.template.domain.account.AccountNotFoundError
@@ -15,6 +16,7 @@ import org.jooq.DSLContext
 import org.jooq.generated.tables.records.AccountsRecord
 import org.jooq.generated.tables.references.ACCOUNTS
 import org.jooq.kotlin.coroutines.transactionCoroutine
+import java.time.ZoneOffset
 
 class SqlAccountRepository(private val dslContext: DSLContext) : AccountRepository {
 
@@ -53,7 +55,6 @@ class SqlAccountRepository(private val dslContext: DSLContext) : AccountReposito
         accountEntity.attach(config)
         accountEntity.update()
         accountEntity.toDomain()
-      }
     }) { exception ->
       raise(GenericAccountRepositoryError(exception))
     }
@@ -65,7 +66,7 @@ fun Account.toEntity(): AccountsRecord =
     ownerName = ownerName,
     balance = balance,
     currencyCode = currency.currencyCode,
-    createdDateTime = createdDateTime ?: localDateTimeUtcNow(),
+    createdDateTime = createdDateTime?.toLocalDateTimeUtc() ?: localDateTimeUtcNow(),
     updatedDateTime = localDateTimeUtcNow(),
     version = version ?: 1L
   )
@@ -76,6 +77,6 @@ fun AccountsRecord.toDomain() =
     ownerName = ownerName,
     balance = balance,
     currency = Currency.getInstance(currencyCode),
-    createdDateTime = createdDateTime,
+    createdDateTime = createdDateTime.toInstant(ZoneOffset.UTC),
     version = version
   )

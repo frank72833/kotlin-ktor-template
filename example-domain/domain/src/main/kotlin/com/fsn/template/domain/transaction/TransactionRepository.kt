@@ -11,3 +11,8 @@ interface TransactionRepository {
   context(Raise<ApplicationError>)
   suspend fun createTransaction(transaction: Transaction): Transaction
 }
+
+data class GenericTransactionRepositoryError(
+  override val cause: Throwable?,
+  override val message: String = "An error has occurred in Transaction Repository",
+) : ApplicationError.NonRetryableError

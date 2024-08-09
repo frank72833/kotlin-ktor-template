@@ -7,3 +7,5 @@ import java.time.ZoneOffset.UTC
 fun now(): Instant = Instant.now()
 
 fun localDateTimeUtcNow(): LocalDateTime = LocalDateTime.ofInstant(now(), UTC)
+
+fun Instant.toLocalDateTimeUtc(): LocalDateTime = LocalDateTime.ofInstant(this, UTC)

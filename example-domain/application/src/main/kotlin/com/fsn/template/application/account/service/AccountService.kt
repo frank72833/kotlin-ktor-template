@@ -8,23 +8,44 @@ import com.fsn.template.domain.account.AccountId
 import com.fsn.template.domain.account.AccountRepository
 import com.fsn.template.domain.account.command.CreateAccountCommand
 import com.fsn.template.domain.account.command.UpdateAccountCommand
+import com.fsn.template.domain.account.deposit
+import com.fsn.template.domain.account.withdrawal
+import java.math.BigDecimal
+import java.util.Currency
 
 private var LOG = getLogger<AccountService>()
 
 class AccountService(private val accountRepository: AccountRepository) {
-  context(Raise<ApplicationError>)
-  suspend fun createAccount(request: CreateAccountCommand): Account {
-    LOG.info("Creating account: $request")
-    return accountRepository.createAccount(request.toDomain())
-  }
+    context(Raise<ApplicationError>)
+    suspend fun createAccount(request: CreateAccountCommand): Account {
+        LOG.info("Creating account: $request")
+        return accountRepository.createAccount(request.toDomain())
+    }
 
-  context(Raise<ApplicationError>)
-  suspend fun updateAccount(request: UpdateAccountCommand): Account {
-    LOG.info("Updating account: $request")
-    val account = getAccount(request.accountId)
-    return accountRepository.updateAccount(request.updateDomain(account))
-  }
+    context(Raise<ApplicationError>)
+    suspend fun updateAccount(request: UpdateAccountCommand): Account {
+        LOG.info("Updating account: $request")
+        val account = getAccount(request.accountId)
+        return accountRepository.updateAccount(request.updateDomain(account))
+    }
 
-  context(Raise<ApplicationError>)
-  suspend fun getAccount(id: AccountId): Account = accountRepository.getAccount(id)
+    context(Raise<ApplicationError>)
+    suspend fun getAccount(id: AccountId): Account = accountRepository.getAccount(id)
+
+    context(Raise<ApplicationError>)
+    suspend fun updateAccountBalances(
+        fromAccountId: AccountId,
+        toAccountId: AccountId,
+        amount: BigDecimal,
+        currency: Currency
+    ) {
+        val fromAccount = getAccount(fromAccountId)
+        val toAccount = getAccount(toAccountId)
+
+        val fromAccountUpdate = fromAccount.withdrawal(amount, currency)
+        val toAccountUpdate = toAccount.deposit(amount, currency)
+
+        accountRepository.updateAccount(fromAccountUpdate)
+        accountRepository.updateAccount(toAccountUpdate)
+    }
 }

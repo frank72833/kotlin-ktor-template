@@ -7,6 +7,9 @@ import org.jooq.DSLContext
 import org.jooq.SQLDialect
 import org.jooq.conf.Settings
 import org.jooq.impl.DSL
+import org.jooq.kotlin.coroutines.transactionCoroutine
+
+lateinit var dslContext: DSLContext
 
 fun Application.configureDatabases(): DSLContext {
   val driverClass = environment.config.property("storage.driverClassName").getString()
@@ -14,7 +17,7 @@ fun Application.configureDatabases(): DSLContext {
   val username = environment.config.property("storage.username").getString()
   val password = environment.config.property("storage.password").getString()
 
-  return DSL.using(
+  dslContext = DSL.using(
     provideDataSource(
       url = jdbcUrl,
       username = username,
@@ -26,6 +29,8 @@ fun Application.configureDatabases(): DSLContext {
       .withExecuteWithOptimisticLocking(true)
       .withExecuteWithOptimisticLockingExcludeUnversioned(true)
   )
+
+  return dslContext
 }
 
 private fun provideDataSource(
@@ -46,3 +51,6 @@ private fun provideDataSource(
       validate()
     }
   )
+
+suspend fun <A> runInTransaction(block: suspend (org.jooq.Configuration) -> A) : A =
+  dslContext.transactionCoroutine { config -> block(config) }
