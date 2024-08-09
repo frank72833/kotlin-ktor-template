@@ -9,9 +9,12 @@ import java.util.UUID
 data class CreateAccountCommand(
   val accountId: AccountId = AccountId(UUID.randomUUID()),
   val ownerName: String,
-  val balance: BigDecimal,
   val currency: Currency,
 ) {
   fun toDomain(): Account =
-    Account(id = accountId, ownerName = ownerName, balance = balance, currency = currency)
+    Account(
+      id = accountId,
+      ownerName = ownerName,
+      balance = BigDecimal.ZERO,
+      currency = currency)
 }

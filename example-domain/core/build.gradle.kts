@@ -12,6 +12,9 @@ dependencies {
     // ## Functional Programming ##
     implementation(libs.arrow.core)
 
+    // ## Validation ##
+    implementation(libs.ktor.server.request.validation)
+
     // ## Logging ##
     implementation(libs.logback.classic)
 

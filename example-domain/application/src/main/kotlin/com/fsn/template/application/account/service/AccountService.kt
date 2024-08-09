@@ -11,7 +11,6 @@ import com.fsn.template.domain.account.command.UpdateAccountCommand
 
 private var LOG = getLogger<AccountService>()
 
-
 class AccountService(private val accountRepository: AccountRepository) {
   context(Raise<ApplicationError>)
   suspend fun createAccount(request: CreateAccountCommand): Account {

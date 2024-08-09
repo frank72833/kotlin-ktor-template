@@ -1,4 +1,4 @@
-package com.fsn.template.application.account.adapter.request
+package com.fsn.template.core.account
 
 import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import java.util.UUID

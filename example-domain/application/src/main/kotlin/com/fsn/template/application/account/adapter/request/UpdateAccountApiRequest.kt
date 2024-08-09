@@ -7,22 +7,23 @@ import java.util.UUID
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UpdateAccountApiRequest(val ownerName: String, val balance: String) {
+data class UpdateAccountApiRequest(
+  val ownerName: String? = null,
+) {
 
   fun toDomainCommand(id: UUID): UpdateAccountCommand =
     UpdateAccountCommand(
       accountId = AccountId(id),
-      ownerName = ownerName,
-      balance = balance.toBigDecimal(),
+      ownerName = ownerName!!
     )
 
   fun validate(): ValidationResult {
     val reasonsList = ArrayList<String>()
-    if (ownerName.isBlank()) reasonsList.add("Owner name cannot be empty")
-
-    if (ownerName.length > 100) reasonsList.add("Owner name cannot longer than 100 characters")
-
-    if (balance.toBigDecimalOrNull() == null) reasonsList.add("Balance has to be a number")
+    if (ownerName.isNullOrBlank()) {
+      reasonsList.add("Owner name cannot be empty")
+    } else {
+      if (ownerName.length > 100) reasonsList.add("Owner name cannot longer than 100 characters")
+    }
 
     return if (reasonsList.isEmpty()) ValidationResult.Valid
     else ValidationResult.Invalid(reasonsList)

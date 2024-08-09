@@ -3,17 +3,12 @@ package com.fsn.template.application.account.controller
 import arrow.core.raise.fold
 import com.fsn.template.application.account.adapter.AccountAdapter
 import com.fsn.template.application.account.adapter.request.CreateAccountApiRequest
-import com.fsn.template.application.account.adapter.request.RequestAccountId
 import com.fsn.template.application.account.adapter.request.UpdateAccountApiRequest
-import com.fsn.template.application.configuration.ErrorHttpResponse
-import com.fsn.template.application.configuration.ErrorResponse
+import com.fsn.template.application.configuration.handleFailure
 import com.fsn.template.application.getPathParam
-import com.fsn.template.core.errors.ApplicationError
-import io.ktor.http.HttpStatusCode
+import com.fsn.template.core.account.RequestAccountId
 import io.ktor.server.application.Application
-import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
-import io.ktor.server.request.path
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
@@ -64,20 +59,3 @@ fun Application.configureAccountController(accountAdapter: AccountAdapter) {
     }
   }
 }
-
-private fun handleFailure(error: ApplicationError, call: ApplicationCall): ErrorHttpResponse =
-  when (error) {
-    is ApplicationError.NotFoundError -> {
-      ErrorHttpResponse(
-        statusCode = HttpStatusCode.NotFound,
-        errors = listOf(ErrorResponse(message = error.message, path = call.request.path())),
-      )
-    }
-
-    else -> {
-      ErrorHttpResponse(
-        statusCode = HttpStatusCode.InternalServerError,
-        errors = listOf(ErrorResponse(message = error.message, path = call.request.path())),
-      )
-    }
-  }

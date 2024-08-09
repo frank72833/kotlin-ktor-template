@@ -2,11 +2,11 @@ package com.fsn.template.application.account.adapter
 
 import arrow.core.raise.Raise
 import com.fsn.template.application.account.adapter.request.CreateAccountApiRequest
-import com.fsn.template.application.account.adapter.request.RequestAccountId
 import com.fsn.template.application.account.adapter.request.UpdateAccountApiRequest
 import com.fsn.template.application.account.adapter.response.AccountResponse
 import com.fsn.template.application.account.adapter.response.toCreateAccountResponse
 import com.fsn.template.application.account.service.AccountService
+import com.fsn.template.core.account.RequestAccountId
 import com.fsn.template.core.errors.ApplicationError
 import com.fsn.template.domain.account.AccountId
 import io.ktor.http.HttpStatusCode
