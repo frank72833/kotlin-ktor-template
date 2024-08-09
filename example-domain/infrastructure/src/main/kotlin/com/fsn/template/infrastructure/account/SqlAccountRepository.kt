@@ -55,6 +55,7 @@ class SqlAccountRepository(private val dslContext: DSLContext) : AccountReposito
         accountEntity.attach(config)
         accountEntity.update()
         accountEntity.toDomain()
+      }
     }) { exception ->
       raise(GenericAccountRepositoryError(exception))
     }
