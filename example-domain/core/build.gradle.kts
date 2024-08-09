@@ -12,6 +12,9 @@ dependencies {
     // ## Functional Programming ##
     implementation(libs.arrow.core)
 
+    // ## Logging ##
+    implementation(libs.logback.classic)
+
     // ## Testing ##
     testImplementation(libs.kotlin.test.junit)
 }

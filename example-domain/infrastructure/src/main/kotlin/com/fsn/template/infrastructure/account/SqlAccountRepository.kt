@@ -15,9 +15,6 @@ import org.jooq.DSLContext
 import org.jooq.generated.tables.records.AccountsRecord
 import org.jooq.generated.tables.references.ACCOUNTS
 import org.jooq.kotlin.coroutines.transactionCoroutine
-import org.slf4j.LoggerFactory
-
-private var LOG = LoggerFactory.getLogger(SqlAccountRepository::class.java)
 
 class SqlAccountRepository(private val dslContext: DSLContext) : AccountRepository {
 
@@ -45,7 +42,6 @@ class SqlAccountRepository(private val dslContext: DSLContext) : AccountReposito
         accountEntity.toDomain()
       }
     }) { exception ->
-        LOG.error("SQL Account repository error", exception)
         raise(GenericAccountRepositoryError(exception))
     }
 
@@ -59,7 +55,6 @@ class SqlAccountRepository(private val dslContext: DSLContext) : AccountReposito
         accountEntity.toDomain()
       }
     }) { exception ->
-      LOG.error("SQL Account repository error", exception)
       raise(GenericAccountRepositoryError(exception))
     }
 }

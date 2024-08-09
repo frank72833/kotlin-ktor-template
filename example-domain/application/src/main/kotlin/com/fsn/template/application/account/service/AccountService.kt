@@ -2,14 +2,15 @@ package com.fsn.template.application.account.service
 
 import arrow.core.raise.Raise
 import com.fsn.template.core.errors.ApplicationError
+import com.fsn.template.core.getLogger
 import com.fsn.template.domain.account.Account
 import com.fsn.template.domain.account.AccountId
 import com.fsn.template.domain.account.AccountRepository
 import com.fsn.template.domain.account.command.CreateAccountCommand
 import com.fsn.template.domain.account.command.UpdateAccountCommand
-import org.slf4j.LoggerFactory
 
-private var LOG = LoggerFactory.getLogger(AccountService::class.java)
+private var LOG = getLogger<AccountService>()
+
 
 class AccountService(private val accountRepository: AccountRepository) {
   context(Raise<ApplicationError>)
