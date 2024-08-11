@@ -3,65 +3,69 @@ package com.fsn.template.infrastructure.transaction
 import arrow.core.raise.Raise
 import arrow.core.raise.catch
 import com.fsn.template.core.errors.ApplicationError
-import com.fsn.template.core.localDateTimeUtcNow
-import com.fsn.template.core.toLocalDateTimeUtc
 import com.fsn.template.domain.account.AccountId
 import com.fsn.template.domain.transaction.GenericTransactionRepositoryError
 import com.fsn.template.domain.transaction.Transaction
 import com.fsn.template.domain.transaction.TransactionId
 import com.fsn.template.domain.transaction.TransactionRepository
-import org.jooq.DSLContext
-import org.jooq.generated.tables.records.TransactionsRecord
-import org.jooq.generated.tables.references.TRANSACTIONS
-import org.jooq.kotlin.coroutines.transactionCoroutine
-import java.time.ZoneOffset
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toJavaInstant
+import kotlinx.datetime.toKotlinInstant
+import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.exposed.dao.id.IdTable
+import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.kotlin.datetime.CurrentDateTime
+import org.jetbrains.exposed.sql.kotlin.datetime.datetime
+import org.jetbrains.exposed.sql.or
+import org.jetbrains.exposed.sql.selectAll
 import java.util.Currency
 
-class SqlTransactionRepository(private val dslContext: DSLContext): TransactionRepository {
+object TransactionsTable : IdTable<String>("transactions") {
+    override val id = TransactionsTable.varchar("id", 50).entityId()
+    val fromAccountId = TransactionsTable.varchar("from_account_id", 50)
+    val toAccountId = TransactionsTable.varchar("to_account_id", 50)
+    val amount = TransactionsTable.decimal("amount", 65, 8)
+    val currencyCode = TransactionsTable.varchar("currency_code", 3)
+    val businessDateTime = datetime("business_date_time")
+    val createdDateTime = datetime("created_date_time").defaultExpression(CurrentDateTime)
+
+    override val primaryKey = PrimaryKey(id, name = "pk_transactions_id")
+}
+
+class SqlTransactionRepository: TransactionRepository {
     context(Raise<ApplicationError>)
     override suspend fun getTransactions(accountId: AccountId): List<Transaction> =
         catch({
-            dslContext.transactionCoroutine { config ->
-                config.dsl()
-                    .selectFrom(TRANSACTIONS)
-                    .where(
-                        TRANSACTIONS.FROM_ACCOUNT_ID.eq(accountId.value.toString())
-                            .or(TRANSACTIONS.TO_ACCOUNT_ID.eq(accountId.value.toString()))
-                        )
-                    .fetch()
-                    .map { it.toDomain() }
-            }
+            val accountIdString = accountId.value.toString()
+            TransactionsTable.selectAll()
+                .where {
+                    (TransactionsTable.fromAccountId eq accountIdString)
+                        .or(TransactionsTable.toAccountId eq accountIdString)
+                }.map { it.toTransactionDomain() }
         }) { exception -> raise(GenericTransactionRepositoryError(exception)) }
 
     context(Raise<ApplicationError>)
-    override suspend fun createTransaction(transaction: Transaction): Transaction =
+    override suspend fun createTransaction(transaction: Transaction): Unit =
         catch({
-            dslContext.transactionCoroutine { config ->
-                val entity = transaction.toEntity()
-                entity.attach(config)
-                entity.insert()
-                entity.toDomain()
+            TransactionsTable.insert {
+                it[id] = transaction.id.value.toString()
+                it[fromAccountId] = transaction.fromAccountId.value.toString()
+                it[toAccountId] = transaction.toAccountId.value.toString()
+                it[amount] = transaction.amount
+                it[currencyCode] = transaction.currency.currencyCode
+                it[businessDateTime] = transaction.businessDateTime.toKotlinInstant().toLocalDateTime(TimeZone.UTC)
             }
         }) { exception -> raise(GenericTransactionRepositoryError(exception)) }
 }
 
-fun TransactionsRecord.toDomain() : Transaction =
+private fun ResultRow.toTransactionDomain() : Transaction =
     Transaction(
-        id = TransactionId.fromString(id),
-        fromAccountId = AccountId.fromString(fromAccountId),
-        toAccountId = AccountId.fromString(toAccountId),
-        amount = amount,
-        currency = Currency.getInstance(currencyCode),
-        businessDateTime = businessDateTime.toInstant(ZoneOffset.UTC),
-    )
-
-fun Transaction.toEntity(): TransactionsRecord =
-    TransactionsRecord(
-        id = id.value.toString(),
-        fromAccountId = fromAccountId.value.toString(),
-        toAccountId = toAccountId.value.toString(),
-        amount = amount,
-        currencyCode = currency.currencyCode,
-        businessDateTime = businessDateTime.toLocalDateTimeUtc(),
-        createdDateTime = localDateTimeUtcNow()
+        id = TransactionId.fromString(this[TransactionsTable.id].value),
+        fromAccountId = AccountId.fromString(this[TransactionsTable.fromAccountId]),
+        toAccountId = AccountId.fromString(this[TransactionsTable.toAccountId]),
+        amount = this[TransactionsTable.amount],
+        currency = Currency.getInstance(this[TransactionsTable.currencyCode]),
+        businessDateTime = this[TransactionsTable.businessDateTime].toInstant(TimeZone.UTC).toJavaInstant()
     )

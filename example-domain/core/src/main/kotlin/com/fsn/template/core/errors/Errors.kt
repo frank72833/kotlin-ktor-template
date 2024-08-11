@@ -9,4 +9,6 @@ sealed interface ApplicationError {
   interface RetryableError : ApplicationError
 
   interface NotFoundError : RetryableError
+
+  interface OptimisticLockError: RetryableError
 }

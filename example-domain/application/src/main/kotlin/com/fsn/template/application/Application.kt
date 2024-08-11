@@ -30,13 +30,13 @@ fun Application.module() {
   configureFlyway()
 
   // Accounts
-  val accountRepository = SqlAccountRepository(dslContext)
+  val accountRepository = SqlAccountRepository()
   val accountService = AccountService(accountRepository)
   val accountAdapter = AccountAdapter(accountService)
   configureAccountController(accountAdapter)
 
   // Transactions
-  val repository = SqlTransactionRepository(dslContext)
+  val repository = SqlTransactionRepository()
   val transactionService = TransactionService(
     repository = repository,
     accountService = accountService

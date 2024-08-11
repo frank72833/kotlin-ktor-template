@@ -9,7 +9,7 @@ interface TransactionRepository {
   suspend fun getTransactions(accountId: AccountId): List<Transaction>
 
   context(Raise<ApplicationError>)
-  suspend fun createTransaction(transaction: Transaction): Transaction
+  suspend fun createTransaction(transaction: Transaction): Unit
 }
 
 data class GenericTransactionRepositoryError(

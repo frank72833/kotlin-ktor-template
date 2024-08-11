@@ -9,24 +9,27 @@ import com.fsn.template.application.account.service.AccountService
 import com.fsn.template.core.account.RequestAccountId
 import com.fsn.template.core.errors.ApplicationError
 import com.fsn.template.domain.account.AccountId
+import com.fsn.template.infrastructure.utils.suspendTransaction
 import io.ktor.http.HttpStatusCode
 
 class AccountAdapter(private val accountService: AccountService) {
 
   context(Raise<ApplicationError>)
-  suspend fun createAccount(request: CreateAccountApiRequest): AccountResponse =
+  suspend fun createAccount(request: CreateAccountApiRequest): AccountResponse = suspendTransaction {
     accountService
       .createAccount(request.toDomainCommand())
       .toCreateAccountResponse(HttpStatusCode.Created)
+  }
 
   context(Raise<ApplicationError>)
   suspend fun updateAccount(
     accountId: RequestAccountId,
     request: UpdateAccountApiRequest,
-  ): AccountResponse =
+  ): AccountResponse = suspendTransaction {
     accountService
       .updateAccount(request.toDomainCommand(accountId.id))
       .toCreateAccountResponse(HttpStatusCode.OK)
+  }
 
   context(Raise<ApplicationError>)
   suspend fun getAccount(accountId: RequestAccountId): AccountResponse =

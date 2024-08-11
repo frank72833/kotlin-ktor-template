@@ -19,7 +19,7 @@ dependencies {
     implementation(libs.arrow.core)
 
     // ## DB ##
-    implementation(libs.exposed.core)
+    api(libs.exposed.core) // For the Adapter layer to access transactions
     implementation(libs.exposed.jdbc)
     implementation(libs.exposed.dao)
     implementation(libs.exposed.kotlin.datetime)
