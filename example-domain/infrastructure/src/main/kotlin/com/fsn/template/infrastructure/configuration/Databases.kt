@@ -1,36 +1,26 @@
 package com.fsn.template.infrastructure.configuration
 
+import com.fsn.template.core.errors.ApplicationError
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.Application
-import org.jooq.DSLContext
-import org.jooq.SQLDialect
-import org.jooq.conf.Settings
-import org.jooq.impl.DSL
-import org.jooq.kotlin.coroutines.transactionCoroutine
+import org.jetbrains.exposed.sql.Database
+import kotlin.reflect.KClass
 
-lateinit var dslContext: DSLContext
-
-fun Application.configureDatabases(): DSLContext {
+fun Application.configureDatabases() {
   val driverClass = environment.config.property("storage.driverClassName").getString()
   val jdbcUrl = environment.config.property("storage.jdbcUrl").getString()
   val username = environment.config.property("storage.username").getString()
   val password = environment.config.property("storage.password").getString()
 
-  dslContext = DSL.using(
+  Database.connect(
     provideDataSource(
       url = jdbcUrl,
       username = username,
       password = password,
       driverClass = driverClass,
-    ),
-    SQLDialect.MYSQL,
-    Settings()
-      .withExecuteWithOptimisticLocking(true)
-      .withExecuteWithOptimisticLockingExcludeUnversioned(true)
+    )
   )
-
-  return dslContext
 }
 
 private fun provideDataSource(
@@ -52,5 +42,9 @@ private fun provideDataSource(
     }
   )
 
-suspend fun <A> runInTransaction(block: suspend (org.jooq.Configuration) -> A) : A =
-  dslContext.transactionCoroutine { config -> block(config) }
+data class OptimisticRepositoryError(
+  val id: Any,
+  val clazz: String,
+  override val cause: Throwable? = null,
+  override val message: String = "Optimistic lock repository error for entity class: $clazz and id: $id",
+) : ApplicationError.RetryableError

@@ -26,9 +26,6 @@ dependencies {
     // ## Functional Programming ##
     implementation(libs.arrow.core)
 
-    // ## Database ##
-    implementation(libs.jooq.kotlin)
-
     // ## Logging ##
     implementation(libs.logback.classic)
 

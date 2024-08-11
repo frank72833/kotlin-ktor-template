@@ -1,16 +1,16 @@
-CREATE TABLE IF NOT EXISTS TRANSACTIONS (
-    ID VARCHAR(50) NOT NULL,
-    FROM_ACCOUNT_ID VARCHAR(50) NOT NULL,
-    TO_ACCOUNT_ID VARCHAR(50) NOT NULL,
-    AMOUNT DECIMAL(65, 8) NOT NULL,
-    CURRENCY_CODE VARCHAR(3) NOT NULL,
-    BUSINESS_DATE_TIME DATETIME(6) NOT NULL,
-    CREATED_DATE_TIME DATETIME(6) NOT NULL,
+CREATE TABLE IF NOT EXISTS transactions (
+    id VARCHAR(50) NOT NULL,
+    from_account_id VARCHAR(50) NOT NULL,
+    to_account_id VARCHAR(50) NOT NULL,
+    amount DECIMAL(65, 8) NOT NULL,
+    currency_code VARCHAR(3) NOT NULL,
+    business_date_time DATETIME(6) NOT NULL,
+    created_date_time DATETIME(6) NOT NULL,
     CONSTRAINT pk_transactions_id PRIMARY KEY (id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
-ALTER TABLE TRANSACTIONS
-  ADD INDEX transactions_from_account_time_index (FROM_ACCOUNT_ID, BUSINESS_DATE_TIME);
+ALTER TABLE transactions
+  ADD INDEX transactions_from_account_time_index (from_account_id, business_date_time);
 
-ALTER TABLE TRANSACTIONS
-  ADD INDEX transactions_to_account_time_index (TO_ACCOUNT_ID, BUSINESS_DATE_TIME);
+ALTER TABLE transactions
+  ADD INDEX transactions_to_account_time_index (to_account_id, business_date_time);

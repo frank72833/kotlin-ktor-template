@@ -26,8 +26,10 @@ class TransactionService(
         // Fake operation taking way too long
         delay(30.seconds)
         //raise(GenericTransactionRepositoryError(null))
-        throw RuntimeException("BOOOM!")
-        return repository.createTransaction(command.toDomain())
+        //throw RuntimeException("BOOOM!")
+        val transaction = command.toDomain()
+        repository.createTransaction(transaction)
+        return transaction
     }
 
     context(Raise<ApplicationError>)

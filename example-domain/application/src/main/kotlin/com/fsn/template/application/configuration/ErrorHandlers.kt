@@ -2,7 +2,7 @@ package com.fsn.template.application.configuration
 
 import com.fsn.template.core.errors.ApplicationError
 import com.fsn.template.core.getLogger
-import com.fsn.template.infrastructure.account.SqlAccountRepository
+import com.fsn.template.infrastructure.configuration.OptimisticRepositoryError
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCall
@@ -12,7 +12,7 @@ import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.request.path
 import io.ktor.server.response.respond
 
-private var LOG = getLogger<SqlAccountRepository>()
+private var LOG = getLogger<Application>()
 
 fun Application.configureErrorHandlers() {
     install(StatusPages) {
@@ -59,8 +59,14 @@ fun handleFailure(
                 errors = listOf(ErrorResponse(message = error.message, path = call.request.path())),
             )
 
+        is OptimisticRepositoryError ->
+            ErrorHttpResponse(
+                statusCode = HttpStatusCode.Conflict,
+                errors = listOf(ErrorResponse(message = error.message, path = call.request.path())),
+            )
+
         else -> {
-            LOG.error("An error has occurred: ${error.message}")
+            LOG.error("An error has occurred: ${error.message}", error.cause)
             ErrorHttpResponse(
                 statusCode = HttpStatusCode.InternalServerError,
                 errors = listOf(ErrorResponse(message = error.message, path = call.request.path()))
