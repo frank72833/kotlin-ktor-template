@@ -6,7 +6,9 @@ plugins {
     id("buildlogic.kotlin-library-conventions")
 }
 
-tasks.named<Jar>("jar") { archiveFileName.set("example-domain-domain.jar") }
+tasks.jar {
+    archiveFileName.set("example-domain-domain.jar")
+}
 
 dependencies {
     implementation(project(":example-domain:core"))

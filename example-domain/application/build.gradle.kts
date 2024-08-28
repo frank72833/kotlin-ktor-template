@@ -7,7 +7,9 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
-tasks.named<Jar>("jar") { archiveFileName.set("example-domain-application.jar") }
+tasks.jar {
+    archiveFileName.set("example-domain-application.jar")
+}
 
 dependencies {
     api(project(":example-domain:domain"))

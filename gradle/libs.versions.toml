@@ -2,7 +2,7 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-kotlin-gradle-plugin = "2.0.0"
+kotlin-gradle-plugin = "2.0.20"
 kotlin.code.style = "official"
 ktor_version = "2.3.12"
 kotlin_version = "2.0.0"
@@ -36,7 +36,6 @@ exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exp
 
 # Required to work with datetime in DB
 exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed_version" }
-
 
 # Required to work with datetime in DB
 hikari-cp = { module = "com.zaxxer:HikariCP", version.ref = "hikari_version" }
